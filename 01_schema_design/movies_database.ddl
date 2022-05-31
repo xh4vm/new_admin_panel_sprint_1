@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS content.film_work (
     modified TIMESTAMP WITH TIME ZONE
 ); 
 CREATE UNIQUE INDEX IF NOT EXISTS content_film_work_title_unique_idx ON content.film_work(title);
+CREATE INDEX IF NOT EXISTS content_film_work_creation_date_idx ON content.film_work(creation_date);
 CREATE INDEX IF NOT EXISTS content_film_work_title_idx ON content.film_work(title);
 
 CREATE TABLE IF NOT EXISTS content.person (
