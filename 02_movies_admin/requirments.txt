@@ -1,5 +1,6 @@
 asgiref==3.5.2
 Django==3.2
+django-split-settings==1.1.0
 flake8==4.0.0
 mccabe==0.6.1
 pycodestyle==2.8.0
