@@ -24,7 +24,7 @@ class Genre(UUIDMixin, TimeStampedMixin):
     description = models.TextField(_('description'), blank=True)
 
     class Meta:
-        db_table = 'content\'.\'genre'
+        db_table = "content'.'genre"
         verbose_name = _('Genre')
         verbose_name_plural = _('Genres')
 
@@ -49,12 +49,12 @@ class FilmWork(UUIDMixin, TimeStampedMixin):
     genres = models.ManyToManyField(Genre, through='GenreFilmWork')
 
     class Meta:
-        db_table = 'content\'.\'film_work'
+        db_table = "content'.'film_work"
         verbose_name = _('Film')
         verbose_name_plural = _('Films')
 
     def __str__(self):
-        return self.title 
+        return self.title
 
 
 class GenreFilmWork(UUIDMixin):
@@ -63,9 +63,9 @@ class GenreFilmWork(UUIDMixin):
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = 'content\'.\'genre_film_work'
+        db_table = "content'.'genre_film_work"
 
-    
+
 class Gender(models.TextChoices):
 
     MALE = 'male', _('Male')
@@ -82,7 +82,7 @@ class Person(UUIDMixin, TimeStampedMixin):
         return self.full_name
 
     class Meta:
-        db_table = 'content\'.\'person'
+        db_table = "content'.'person"
         verbose_name = _('Person')
         verbose_name_plural = _('Persons')
 
@@ -99,4 +99,4 @@ class PersonFilmWork(UUIDMixin):
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = 'content\'.\'person_film_work'
+        db_table = "content'.'person_film_work"
