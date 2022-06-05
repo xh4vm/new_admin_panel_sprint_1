@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-05 11:51+0000\n"
+"POT-Creation-Date: 2022-06-05 17:09+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1495,37 +1495,41 @@ msgstr ""
 msgid "movies"
 msgstr "Movies"
 
-#: movies/models.py:24
+#: movies/models.py:23
 msgid "name"
 msgstr "Genre name"
 
-#: movies/models.py:25 movies/models.py:43
+#: movies/models.py:24 movies/models.py:42
 msgid "description"
 msgstr "Description"
 
-#: movies/models.py:29 movies/models.py:61 movies/models.py:69
+#: movies/models.py:28 movies/models.py:61 movies/models.py:69
 msgid "Genre"
 msgstr "Genre"
 
-#: movies/models.py:30 movies/models.py:70
+#: movies/models.py:29 movies/models.py:70
 msgid "Genres"
 msgstr "Genres"
 
-#: movies/models.py:37
+#: movies/models.py:36
 msgid "Movie"
 msgstr "Movie"
 
-#: movies/models.py:38
+#: movies/models.py:37
 msgid "TV Show"
 msgstr "TV Show"
 
-#: movies/models.py:42
+#: movies/models.py:41
 msgid "title"
 msgstr "Title"
 
-#: movies/models.py:44
+#: movies/models.py:43
 msgid "creation_date"
 msgstr "Creation Date"
+
+#: movies/models.py:44
+msgid "file_path"
+msgstr "File Path"
 
 #: movies/models.py:45
 msgid "rating"
@@ -1587,6 +1591,3 @@ msgstr "Role"
 
 #~ msgid "certificate"
 #~ msgstr "Certificate"
-
-#~ msgid "file_path"
-#~ msgstr "File Path"

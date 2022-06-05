@@ -47,6 +47,7 @@ class FilmWorkAdmin(admin.ModelAdmin):
         'genres__name',
     )
     search_fields = ('title', 'genres__name')
+    autocomplete_fields = ('genres',)
 
     # @display
     # def get_director(self, obj):

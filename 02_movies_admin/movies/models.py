@@ -41,12 +41,9 @@ class FilmWork(UUIDMixin, TimeStampedMixin):
     title = models.CharField(_('title'), max_length=255, unique=True)
     description = models.CharField(_('description'), max_length=4096)
     creation_date = models.DateField(_('creation_date'))
-    rating = models.FloatField(
-        _('rating'), validators=[MinValueValidator(0), MaxValueValidator(100)]
-    )
-    type = models.CharField(
-        _('type'), choices=FilmWorkType.choices, default=FilmWorkType.MOVIE, max_length=255
-    )
+    file_path = models.CharField(_('file_path'), max_length=4096, blank=True, default='')
+    rating = models.FloatField(_('rating'), validators=[MinValueValidator(0), MaxValueValidator(100)])
+    type = models.CharField(_('type'), choices=FilmWorkType.choices, default=FilmWorkType.MOVIE, max_length=255)
 
     genres = models.ManyToManyField(Genre, through='GenreFilmWork')
 
@@ -60,9 +57,7 @@ class FilmWork(UUIDMixin, TimeStampedMixin):
 
 
 class GenreFilmWork(UUIDMixin):
-    film_work = models.ForeignKey(
-        'FilmWork', on_delete=models.CASCADE, verbose_name=_('Film Work')
-    )
+    film_work = models.ForeignKey('FilmWork', on_delete=models.CASCADE, verbose_name=_('Film Work'))
     genre = models.ForeignKey('Genre', on_delete=models.CASCADE, verbose_name=_('Genre'))
     created = models.DateTimeField(auto_now_add=True)
 
@@ -102,9 +97,7 @@ class PersonFilmWorkRole(models.TextChoices):
 
 
 class PersonFilmWork(UUIDMixin):
-    film_work = models.ForeignKey(
-        'FilmWork', on_delete=models.CASCADE, verbose_name=_('Film Work')
-    )
+    film_work = models.ForeignKey('FilmWork', on_delete=models.CASCADE, verbose_name=_('Film Work'))
     person = models.ForeignKey('Person', on_delete=models.CASCADE, verbose_name=_('Person'))
     role = models.CharField(_('role'), choices=PersonFilmWorkRole.choices, max_length=255)
     created = models.DateTimeField(auto_now_add=True)

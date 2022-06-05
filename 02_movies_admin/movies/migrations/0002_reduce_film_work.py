@@ -12,12 +12,10 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterModelOptions(
-            name='genrefilmwork',
-            options={'verbose_name': 'Genre', 'verbose_name_plural': 'Genres'},
+            name='genrefilmwork', options={'verbose_name': 'Genre', 'verbose_name_plural': 'Genres'},
         ),
         migrations.AlterModelOptions(
-            name='personfilmwork',
-            options={'verbose_name': 'Person', 'verbose_name_plural': 'Persons'},
+            name='personfilmwork', options={'verbose_name': 'Person', 'verbose_name_plural': 'Persons'},
         ),
         migrations.RemoveField(model_name='filmwork', name='certificate',),
         migrations.RemoveField(model_name='filmwork', name='file_path',),
@@ -25,36 +23,28 @@ class Migration(migrations.Migration):
             model_name='genrefilmwork',
             name='film_work',
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE,
-                to='movies.filmwork',
-                verbose_name='Film Work',
+                on_delete=django.db.models.deletion.CASCADE, to='movies.filmwork', verbose_name='Film Work',
             ),
         ),
         migrations.AlterField(
             model_name='genrefilmwork',
             name='genre',
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE,
-                to='movies.genre',
-                verbose_name='Genre',
+                on_delete=django.db.models.deletion.CASCADE, to='movies.genre', verbose_name='Genre',
             ),
         ),
         migrations.AlterField(
             model_name='personfilmwork',
             name='film_work',
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE,
-                to='movies.filmwork',
-                verbose_name='Film Work',
+                on_delete=django.db.models.deletion.CASCADE, to='movies.filmwork', verbose_name='Film Work',
             ),
         ),
         migrations.AlterField(
             model_name='personfilmwork',
             name='person',
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE,
-                to='movies.person',
-                verbose_name='Person',
+                on_delete=django.db.models.deletion.CASCADE, to='movies.person', verbose_name='Person',
             ),
         ),
     ]
