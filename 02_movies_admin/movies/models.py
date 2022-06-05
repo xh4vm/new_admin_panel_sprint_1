@@ -70,15 +70,8 @@ class GenreFilmWork(UUIDMixin):
         verbose_name_plural = _('Genres')
 
 
-class Gender(models.TextChoices):
-
-    MALE = 'male', _('Male')
-    FEMALE = 'female', _('Female')
-
-
 class Person(UUIDMixin, TimeStampedMixin):
     full_name = models.CharField(_('full_name'), max_length=512)
-    gender = models.CharField(_('gender'), choices=Gender.choices, max_length=32, null=True)
 
     films = models.ManyToManyField(FilmWork, through='PersonFilmWork')
 
