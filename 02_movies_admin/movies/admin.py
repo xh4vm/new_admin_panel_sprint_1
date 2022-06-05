@@ -50,4 +50,3 @@ class FilmWorkAdmin(admin.ModelAdmin):
 
     # @display
     # def get_director(self, obj):
-

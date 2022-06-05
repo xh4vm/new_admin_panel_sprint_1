@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-03 17:42+0000\n"
+"POT-Creation-Date: 2022-06-05 11:51+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1511,94 +1511,98 @@ msgstr ""
 msgid "movies"
 msgstr "Фильмы"
 
-#: movies/models.py:23
+#: movies/models.py:24
 msgid "name"
 msgstr "Название жанра"
 
-#: movies/models.py:24 movies/models.py:42
+#: movies/models.py:25 movies/models.py:43
 msgid "description"
 msgstr "Описание"
 
-#: movies/models.py:28
+#: movies/models.py:29 movies/models.py:61 movies/models.py:69
 msgid "Genre"
 msgstr "Жанр"
 
-#: movies/models.py:29
+#: movies/models.py:30 movies/models.py:70
 msgid "Genres"
 msgstr "Жанры"
 
-#: movies/models.py:36
+#: movies/models.py:37
 msgid "Movie"
 msgstr "Видео"
 
-#: movies/models.py:37
+#: movies/models.py:38
 msgid "TV Show"
 msgstr "ТВ передача"
 
-#: movies/models.py:41
+#: movies/models.py:42
 msgid "title"
 msgstr "Заголовок"
 
-#: movies/models.py:43
+#: movies/models.py:44
 msgid "creation_date"
 msgstr "Дата публикации"
 
-#: movies/models.py:44
+#: movies/models.py:45
 msgid "rating"
 msgstr "Рейтинг"
 
-#: movies/models.py:45
+#: movies/models.py:46
 msgid "type"
 msgstr "Тип"
 
-#: movies/models.py:46
-msgid "certificate"
-msgstr "Лицензия"
-
-#: movies/models.py:47
-msgid "file_path"
-msgstr "Путь файла"
-
-#: movies/models.py:53
+#: movies/models.py:52
 msgid "Film"
 msgstr "Фильм"
 
-#: movies/models.py:54
+#: movies/models.py:53
 msgid "Films"
 msgstr "Фильмы"
 
-#: movies/models.py:71
+#: movies/models.py:60 movies/models.py:100
+#, fuzzy
+#| msgid "Film"
+msgid "Film Work"
+msgstr "Фильм"
+
+#: movies/models.py:75
 msgid "Male"
 msgstr "Мужской"
 
-#: movies/models.py:72
+#: movies/models.py:76
 msgid "Female"
 msgstr "Женский"
 
-#: movies/models.py:76
+#: movies/models.py:80
 msgid "full_name"
 msgstr "Полное имя"
 
-#: movies/models.py:77
+#: movies/models.py:81
 msgid "gender"
 msgstr "Пол"
 
-#: movies/models.py:86
+#: movies/models.py:90 movies/models.py:101 movies/models.py:110
 msgid "Person"
-msgstr "Действующиее лицо"
+msgstr "Действующее лицо"
 
-#: movies/models.py:87
+#: movies/models.py:91 movies/models.py:111
 msgid "Persons"
 msgstr "Действующие лица"
 
-#: movies/models.py:91
+#: movies/models.py:95
 msgid "Actor"
 msgstr "Актер"
 
-#: movies/models.py:92
+#: movies/models.py:96
 msgid "Director"
 msgstr "Режисер"
 
-#: movies/models.py:98
+#: movies/models.py:102
 msgid "role"
 msgstr "Роль"
+
+#~ msgid "certificate"
+#~ msgstr "Лицензия"
+
+#~ msgid "file_path"
+#~ msgstr "Путь файла"
