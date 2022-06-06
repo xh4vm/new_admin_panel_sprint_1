@@ -1,20 +1,58 @@
+import os
+import pathlib
 import sqlite3
+from typing import Any, Dict
 
 import psycopg2
-from psycopg2.extensions import connection as _connection
+# from psycopg2.extensions import connection as _connection
 from psycopg2.extras import DictCursor
+from contextlib import contextmanager
+from dotenv import load_dotenv
+
+from sqlite_loader import SQLiteLoader
+from postgres_saver import PostgresSaver
 
 
-def load_from_sqlite(connection: sqlite3.Connection, pg_conn: _connection):
+@contextmanager
+def conn_context(db_path: str):
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+
+    yield conn
+
+    conn.close()
+
+
+def load_from_sqlite(connection: sqlite3.Connection, pg_cursor: DictCursor) -> None:
     """Основной метод загрузки данных из SQLite в Postgres"""
-    # postgres_saver = PostgresSaver(pg_conn)
-    # sqlite_loader = SQLiteLoader(connection)
+    postgres_saver = PostgresSaver(pg_cursor)
+    sqlite_loader = SQLiteLoader(connection)
 
     # data = sqlite_loader.load_movies()
     # postgres_saver.save_all_data(data)
 
+    data = sqlite_loader.load_genres()
+    postgres_saver.save_genres(data)
+
+
+def get_postgresql_dsl() -> Dict[str, Any]:
+    return {
+        'dbname': os.environ.get('DB_NAME'), 
+        'user': os.environ.get('DB_USER'), 
+        'password': os.environ.get('DB_PASSWORD'), 
+        'host': os.environ.get('DB_HOST', '127.0.0.1'), 
+        'port': os.environ.get('DB_PORT', 5432), 
+    }
 
 if __name__ == '__main__':
-    dsl = {'dbname': 'movies_database', 'user': 'app', 'password': '123qwe', 'host': '127.0.0.1', 'port': 5432}
-    with sqlite3.connect('db.sqlite') as sqlite_conn, psycopg2.connect(**dsl, cursor_factory=DictCursor) as pg_conn:
-        load_from_sqlite(sqlite_conn, pg_conn)
+    load_dotenv()
+
+    postgresql_dsl = get_postgresql_dsl()
+    sqlite_path = os.environ.get('SQLITE_PATH')
+    schema_file = os.path.join(pathlib.Path(__file__).parent.absolute(), 'schema.sql')
+    
+    with sqlite3.connect(sqlite_path) as sqlite_conn, psycopg2.connect(**postgresql_dsl, cursor_factory=DictCursor) as pg_conn, pg_conn.cursor() as pg_cursor:
+        with open(schema_file, 'r') as schema_fd:
+            pg_cursor.execute(schema_fd.read())
+        
+        load_from_sqlite(sqlite_conn, pg_cursor)
