@@ -5,8 +5,8 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class TimeStampedMixin(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    modeified = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         abstract = True
@@ -59,7 +59,7 @@ class FilmWork(UUIDMixin, TimeStampedMixin):
 class GenreFilmWork(UUIDMixin):
     film_work = models.ForeignKey('FilmWork', on_delete=models.CASCADE, verbose_name=_('Film Work'))
     genre = models.ForeignKey('Genre', on_delete=models.CASCADE, verbose_name=_('Genre'))
-    created = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f'{self.id}'
@@ -96,7 +96,7 @@ class PersonFilmWork(UUIDMixin):
     film_work = models.ForeignKey('FilmWork', on_delete=models.CASCADE, verbose_name=_('Film Work'))
     person = models.ForeignKey('Person', on_delete=models.CASCADE, verbose_name=_('Person'))
     role = models.CharField(_('role'), choices=PersonFilmWorkRole.choices, max_length=255)
-    created = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f'{self.id}'
