@@ -68,6 +68,9 @@ class GenreFilmWork(UUIDMixin):
         db_table = "content'.'genre_film_work"
         verbose_name = _('Genre')
         verbose_name_plural = _('Genres')
+        indexes = (
+            models.Index(fields=['film_work', 'genre']),
+        )
 
 
 class Person(UUIDMixin, TimeStampedMixin):
@@ -102,3 +105,6 @@ class PersonFilmWork(UUIDMixin):
         db_table = "content'.'person_film_work"
         verbose_name = _('Person')
         verbose_name_plural = _('Persons')
+        indexes = (
+            models.Index(fields=['film_work', 'person', 'role']),
+        )
