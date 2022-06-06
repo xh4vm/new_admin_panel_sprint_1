@@ -1,10 +1,12 @@
-from datetime import date
+from datetime import date, datetime
 import enum
 from typing import Optional
 import uuid 
 
 from dataclasses import dataclass, field
 
+
+SCHEMA_NAME = 'content'
 
 class Schema:
     film_work = 'film_work'
@@ -30,8 +32,8 @@ class UUIDMixin:
 
 @dataclass
 class TimeStampedMixin:
-    created: Optional[date] = field(default=None)
-    modified: Optional[date] = field(default=None)
+    created_at: Optional[date] = field(default=None)
+    updated_at: Optional[date] = field(default=None)
 
     class Meta:
         abstract = True
@@ -48,7 +50,7 @@ class FilmWorkBase:
 
 
 @dataclass
-class FilmWork(FilmWorkBase, UUIDMixin, TimeStampedMixin):
+class FilmWork(UUIDMixin, TimeStampedMixin, FilmWorkBase):
     pass
 
 
@@ -59,7 +61,19 @@ class GenreBase:
 
 
 @dataclass
-class Genre(GenreBase, UUIDMixin, TimeStampedMixin):
+class Genre(UUIDMixin, TimeStampedMixin, GenreBase):
+    pass
+
+
+@dataclass
+class GenreFilmWorkBase:
+    film_work_id : uuid.UUID
+    genre_id : uuid.UUID
+    created_at : datetime
+
+
+@dataclass
+class GenreFilmWork(UUIDMixin, GenreFilmWorkBase):
     pass
 
 
@@ -69,5 +83,18 @@ class PersonBase:
 
 
 @dataclass
-class Person(PersonBase, UUIDMixin, TimeStampedMixin):
+class Person(UUIDMixin, TimeStampedMixin, PersonBase):
+    pass
+
+
+@dataclass
+class PersonFilmWorkBase:
+    film_work_id : uuid.UUID
+    person_id : uuid.UUID
+    role : str
+    created_at : datetime
+
+
+@dataclass
+class PersonFilmWork(UUIDMixin, PersonFilmWorkBase):
     pass
