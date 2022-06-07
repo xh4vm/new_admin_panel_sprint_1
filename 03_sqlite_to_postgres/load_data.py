@@ -31,8 +31,9 @@ def load_from_sqlite(connection: sqlite3.Connection, pg_cursor: DictCursor) -> N
     # data = sqlite_loader.load_movies()
     # postgres_saver.save_all_data(data)
 
-    data = sqlite_loader.load_genres()
-    postgres_saver.save_genres(data)
+    
+    data = sqlite_loader.load_movies()
+    # postgres_saver.save_genres(data)
 
 
 def get_postgresql_dsl() -> Dict[str, Any]:
