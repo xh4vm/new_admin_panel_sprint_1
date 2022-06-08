@@ -62,11 +62,12 @@ class PostgresSaver:
         self._multiple_insert(insert_query, data)
 
     def _stack_or_flush(self, schema_name : str, data : type, callback):
+        if data is not None:
+            self.loaded_data[schema_name].append(data)
+
         if len(self.loaded_data[schema_name]) == self.CHUNK:
             callback(self.loaded_data[schema_name])
             self.loaded_data.update({schema_name: []})
-        else:
-            self.loaded_data[schema_name].append(data)
 
     def save_all_data(self, data: Iterator[Dict[str, type]]) -> None:
         

@@ -45,8 +45,8 @@ class TimeStampedMixin:
 class FilmWorkBase:
     title : str
     description : Optional[str]
-    file_path : str
-    type: FilmWorkType
+    file_path : Optional[str]
+    type: str
     creation_date: Optional[date] = field(default=None)
     rating: float = field(default=0.0)
 

@@ -3,6 +3,7 @@ from datetime import datetime
 import sqlite3
 from typing import Any, Dict, Iterator, List
 import uuid
+from dateutil.parser import parse
 
 from schema import Genre, Schema, FilmWork, Person, GenreFilmWork, PersonFilmWork
 
@@ -21,7 +22,7 @@ class SQLiteLoader:
         self.conn = connection
         self.curs = self.conn.cursor()
 
-    def load_movies(self, chunk : int = CHUNK) -> Iterator[type]:
+    def load_movies(self, chunk: int = CHUNK) -> Iterator[type]:
         query = (
             f'SELECT m.id as {Schema.film_work}_id, m.title as {Schema.film_work}_title, m.description as {Schema.film_work}_description, '
             f'm.creation_date as {Schema.film_work}_creation_date, m.file_path as {Schema.film_work}_file_path, m.rating as {Schema.film_work}_rating, '
@@ -36,44 +37,68 @@ class SQLiteLoader:
             f'mp.person_id as {Schema.person_film_work}_person_id, mp.created_at as {Schema.person_film_work}_created_at, '
             f'mp.role as {Schema.person_film_work}_role '
             f'FROM film_work m '
-            f'LEFT JOIN genre_film_work mg ON mg.film_work_id = m.id ' 
+            f'LEFT JOIN genre_film_work mg ON mg.film_work_id = m.id '
             f'LEFT JOIN genre g ON mg.genre_id = g.id '
-            f'LEFT JOIN person_film_work mp ON mp.film_work_id = m.id ' 
+            f'LEFT JOIN person_film_work mp ON mp.film_work_id = m.id '
             f'LEFT JOIN person p ON mp.person_id = p.id '
             f'GROUP BY m.id;'
         )
-        data = {Schema.genre : None, Schema.person : None, Schema.film_work : None,
-            Schema.genre_film_work : None, Schema.person_film_work : None, }
+        data = {
+            Schema.genre: None,
+            Schema.person: None,
+            Schema.film_work: None,
+            Schema.genre_film_work: None,
+            Schema.person_film_work: None,
+        }
         raw_objects = None
         self.curs.execute(query)
 
         while raw_objects != []:
-            raw_objects : List[Dict[str, Any]] = self.curs.fetchmany(chunk)
+            raw_objects: List[Dict[str, Any]] = self.curs.fetchmany(chunk)
 
             for raw_object in raw_objects:
                 raw_object = dict_factory(self.curs, raw_object)
-                
-                data[Schema.genre] = Genre(id=uuid.UUID(raw_object[f'{Schema.genre}_id']), 
-                    name=raw_object[f'{Schema.genre}_name'], description=raw_object[f'{Schema.genre}_description'],
-                    created_at=raw_object[f'{Schema.genre}_created_at'], updated_at=raw_object[f'{Schema.genre}_updated_at'])
 
-                data[Schema.person] = Person(id=uuid.UUID(raw_object[f'{Schema.person}_id']),
+                data[Schema.genre] = Genre(
+                    id=uuid.UUID(raw_object[f'{Schema.genre}_id']),
+                    name=raw_object[f'{Schema.genre}_name'],
+                    description=raw_object[f'{Schema.genre}_description'],
+                    created_at=parse(raw_object[f'{Schema.genre}_created_at']),
+                    updated_at=parse(raw_object[f'{Schema.genre}_updated_at']),
+                )
+
+                data[Schema.person] = Person(
+                    id=uuid.UUID(raw_object[f'{Schema.person}_id']),
                     full_name=raw_object[f'{Schema.person}_full_name'],
-                    created_at=raw_object[f'{Schema.person}_created_at'], updated_at=raw_object[f'{Schema.person}_updated_at'])
+                    created_at=parse(raw_object[f'{Schema.person}_created_at']),
+                    updated_at=parse(raw_object[f'{Schema.person}_updated_at']),
+                )
 
-                data[Schema.film_work] = FilmWork(id=uuid.UUID(raw_object[f'{Schema.film_work}_id']),
-                    title=raw_object[f'{Schema.film_work}_title'], description=raw_object[f'{Schema.film_work}_description'],
-                    creation_date=raw_object[f'{Schema.film_work}_creation_date'], file_path=raw_object[f'{Schema.film_work}_file_path'],
-                    rating=raw_object[f'{Schema.film_work}_rating'], type=raw_object[f'{Schema.film_work}_type'],
-                    created_at=raw_object[f'{Schema.film_work}_created_at'], updated_at=raw_object[f'{Schema.film_work}_updated_at'])
+                data[Schema.film_work] = FilmWork(
+                    id=uuid.UUID(raw_object[f'{Schema.film_work}_id']),
+                    title=raw_object[f'{Schema.film_work}_title'],
+                    description=raw_object[f'{Schema.film_work}_description'],
+                    creation_date=raw_object[f'{Schema.film_work}_creation_date'],
+                    file_path=raw_object[f'{Schema.film_work}_file_path'],
+                    rating=raw_object[f'{Schema.film_work}_rating'],
+                    type=raw_object[f'{Schema.film_work}_type'],
+                    created_at=parse(raw_object[f'{Schema.film_work}_created_at']),
+                    updated_at=parse(raw_object[f'{Schema.film_work}_updated_at']),
+                )
 
-                data[Schema.genre_film_work] = GenreFilmWork(id=uuid.UUID(raw_object[f'{Schema.genre_film_work}_id']), 
-                    film_work_id=raw_object[f'{Schema.genre_film_work}_film_work_id'], genre_id=raw_object[f'{Schema.genre_film_work}_genre_id'],
-                    created_at=raw_object[f'{Schema.genre_film_work}_created_at'])
+                data[Schema.genre_film_work] = GenreFilmWork(
+                    id=uuid.UUID(raw_object[f'{Schema.genre_film_work}_id']),
+                    film_work_id=uuid.UUID(raw_object[f'{Schema.genre_film_work}_film_work_id']),
+                    genre_id=uuid.UUID(raw_object[f'{Schema.genre_film_work}_genre_id']),
+                    created_at=parse(raw_object[f'{Schema.genre_film_work}_created_at']),
+                )
 
-                data[Schema.person_film_work] = PersonFilmWork(id=uuid.UUID(raw_object[f'{Schema.person_film_work}_id']),
-                    film_work_id=raw_object[f'{Schema.person_film_work}_film_work_id'], 
-                    person_id=raw_object[f'{Schema.person_film_work}_person_id'], role=raw_object[f'{Schema.person_film_work}_role'], 
-                    created_at=raw_object[f'{Schema.person_film_work}_created_at'])
+                data[Schema.person_film_work] = PersonFilmWork(
+                    id=uuid.UUID(raw_object[f'{Schema.person_film_work}_id']),
+                    film_work_id=uuid.UUID(raw_object[f'{Schema.person_film_work}_film_work_id']),
+                    person_id=uuid.UUID(raw_object[f'{Schema.person_film_work}_person_id']),
+                    role=raw_object[f'{Schema.person_film_work}_role'],
+                    created_at=parse(raw_object[f'{Schema.person_film_work}_created_at']),
+                )
 
                 yield data
