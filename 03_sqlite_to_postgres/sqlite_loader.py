@@ -1,6 +1,8 @@
 from dataclasses import is_dataclass
+from datetime import datetime
 import sqlite3
 from typing import Any, Dict, Iterator, List
+import uuid
 
 from schema import Genre, Schema, FilmWork, Person, GenreFilmWork, PersonFilmWork
 
@@ -18,9 +20,6 @@ class SQLiteLoader:
     def __init__(self, connection: sqlite3.Connection) -> None:
         self.conn = connection
         self.curs = self.conn.cursor()
-
-        self.data = {Schema.genre : [], Schema.person : [], Schema.film_work : [],
-            Schema.genre_film_work : [], Schema.person_film_work : [], }
 
     def load_movies(self, chunk : int = CHUNK) -> Iterator[type]:
         query = (
@@ -41,68 +40,40 @@ class SQLiteLoader:
             f'LEFT JOIN genre g ON mg.genre_id = g.id '
             f'LEFT JOIN person_film_work mp ON mp.film_work_id = m.id ' 
             f'LEFT JOIN person p ON mp.person_id = p.id '
-            f'GROUP BY m.id '
-            f'LIMIT {chunk};'
+            f'GROUP BY m.id;'
         )
-
+        data = {Schema.genre : None, Schema.person : None, Schema.film_work : None,
+            Schema.genre_film_work : None, Schema.person_film_work : None, }
+        raw_objects = None
         self.curs.execute(query)
-        raw_objects : List[Dict[str, Any]] = self.curs.fetchmany(chunk)
 
-        for raw_object in raw_objects:
-            raw_object = dict_factory(self.curs, raw_object)
+        while raw_objects != []:
+            raw_objects : List[Dict[str, Any]] = self.curs.fetchmany(chunk)
 
-            self.data[Schema.genre].append(Genre(id=raw_object[f'{Schema.genre}_id'], 
-                name=raw_object[f'{Schema.genre}_name'], description=raw_object[f'{Schema.genre}_description'],
-                created_at=raw_object[f'{Schema.genre}_created_at'], updated_at=raw_object[f'{Schema.genre}_updated_at']))
+            for raw_object in raw_objects:
+                raw_object = dict_factory(self.curs, raw_object)
+                
+                data[Schema.genre] = Genre(id=uuid.UUID(raw_object[f'{Schema.genre}_id']), 
+                    name=raw_object[f'{Schema.genre}_name'], description=raw_object[f'{Schema.genre}_description'],
+                    created_at=raw_object[f'{Schema.genre}_created_at'], updated_at=raw_object[f'{Schema.genre}_updated_at'])
 
-            self.data[Schema.person].append(Person(id=raw_object[f'{Schema.person}_id'],
-                full_name=raw_object[f'{Schema.person}_full_name'],
-                created_at=raw_object[f'{Schema.person}_created_at'], updated_at=raw_object[f'{Schema.person}_updated_at']))
+                data[Schema.person] = Person(id=uuid.UUID(raw_object[f'{Schema.person}_id']),
+                    full_name=raw_object[f'{Schema.person}_full_name'],
+                    created_at=raw_object[f'{Schema.person}_created_at'], updated_at=raw_object[f'{Schema.person}_updated_at'])
 
-            self.data[Schema.film_work].append(FilmWork(id=raw_object[f'{Schema.film_work}_id'],
-                title=raw_object[f'{Schema.film_work}_title'], description=raw_object[f'{Schema.film_work}_description'],
-                creation_date=raw_object[f'{Schema.film_work}_creation_date'], file_path=raw_object[f'{Schema.film_work}_file_path'],
-                rating=raw_object[f'{Schema.film_work}_rating'], type=raw_object[f'{Schema.film_work}_type'],
-                created_at=raw_object[f'{Schema.film_work}_created_at'], updated_at=raw_object[f'{Schema.film_work}_updated_at']))
+                data[Schema.film_work] = FilmWork(id=uuid.UUID(raw_object[f'{Schema.film_work}_id']),
+                    title=raw_object[f'{Schema.film_work}_title'], description=raw_object[f'{Schema.film_work}_description'],
+                    creation_date=raw_object[f'{Schema.film_work}_creation_date'], file_path=raw_object[f'{Schema.film_work}_file_path'],
+                    rating=raw_object[f'{Schema.film_work}_rating'], type=raw_object[f'{Schema.film_work}_type'],
+                    created_at=raw_object[f'{Schema.film_work}_created_at'], updated_at=raw_object[f'{Schema.film_work}_updated_at'])
 
-            self.data[Schema.genre_film_work].append(GenreFilmWork(id=raw_object[f'{Schema.genre_film_work}_id'], 
-                film_work_id=raw_object[f'{Schema.genre_film_work}_film_work_id'], genre_id=raw_object[f'{Schema.genre_film_work}_genre_id'],
-                created_at=raw_object[f'{Schema.genre_film_work}_created_at']))
+                data[Schema.genre_film_work] = GenreFilmWork(id=uuid.UUID(raw_object[f'{Schema.genre_film_work}_id']), 
+                    film_work_id=raw_object[f'{Schema.genre_film_work}_film_work_id'], genre_id=raw_object[f'{Schema.genre_film_work}_genre_id'],
+                    created_at=raw_object[f'{Schema.genre_film_work}_created_at'])
 
-            self.data[Schema.person_film_work].append(PersonFilmWork(id=raw_object[f'{Schema.person_film_work}_id'],
-                film_work_id=raw_object[f'{Schema.person_film_work}_film_work_id'], 
-                person_id=raw_object[f'{Schema.person_film_work}_person_id'], role=raw_object[f'{Schema.person_film_work}_role'], 
-                created_at=raw_object[f'{Schema.person_film_work}_created_at']))
+                data[Schema.person_film_work] = PersonFilmWork(id=uuid.UUID(raw_object[f'{Schema.person_film_work}_id']),
+                    film_work_id=raw_object[f'{Schema.person_film_work}_film_work_id'], 
+                    person_id=raw_object[f'{Schema.person_film_work}_person_id'], role=raw_object[f'{Schema.person_film_work}_role'], 
+                    created_at=raw_object[f'{Schema.person_film_work}_created_at'])
 
-        print(self.data)
-
-
-    def _convert_to_dataclass(self, _dataclass : type, chunk : int) -> Iterator[type]:
-        
-        if not is_dataclass(_dataclass):
-            raise TypeError(f'Error dataclass type: {_dataclass}')
-        
-        raw_objects : List[Dict[str, Any]] = self.curs.fetchmany(chunk)
-
-        for raw_object in raw_objects:
-            yield _dataclass(**dict_factory(self.curs, raw_object))
-
-    def load_genres(self, chunk : int = CHUNK) -> Iterator[Genre]:
-        self.curs.execute(f'SELECT * FROM {Schema.genre};')
-        return self._convert_to_dataclass(_dataclass=Genre, chunk=chunk)
-
-    def load_persons(self, chunk : int = CHUNK) -> Iterator[Person]:
-        self.curs.execute(f'SELECT * FROM {Schema.person};')
-        return self._convert_to_dataclass(_dataclass=Person, chunk=chunk)
-        
-    # def load_movies(self, chunk : int = CHUNK) -> Iterator[FilmWork]:
-    #     self.curs.execute(f'SELECT * FROM {Schema.film_work};')
-    #     return self._convert_to_dataclass(_dataclass=FilmWork, chunk=chunk)
-
-    def load_genre_movies(self, chunk : int = CHUNK) -> Iterator[GenreFilmWork]:
-        self.curs.execute(f'SELECT * FROM {Schema.genre_film_work};')
-        return self._convert_to_dataclass(_dataclass=GenreFilmWork, chunk=chunk)
-
-    def load_person_movies(self, chunk : int = CHUNK) -> Iterator[PersonFilmWork]:
-        self.curs.execute(f'SELECT * FROM {Schema.person_film_work};')
-        return self._convert_to_dataclass(_dataclass=PersonFilmWork, chunk=chunk)
+                yield data
