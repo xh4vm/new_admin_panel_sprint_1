@@ -38,11 +38,11 @@ class FilmWorkType(models.TextChoices):
 
 
 class FilmWork(UUIDMixin, TimeStampedMixin):
-    title = models.CharField(_('title'), max_length=255, unique=True)
+    title = models.CharField(_('title'), max_length=255)
     description = models.CharField(_('description'), max_length=4096)
     creation_date = models.DateField(_('creation_date'))
     file_path = models.CharField(_('file_path'), max_length=4096, blank=True, default='')
-    rating = models.FloatField(_('rating'), validators=[MinValueValidator(0), MaxValueValidator(100)])
+    rating = models.FloatField(_('rating'), null=True,  validators=[MinValueValidator(0), MaxValueValidator(100)])
     type = models.CharField(_('type'), choices=FilmWorkType.choices, default=FilmWorkType.MOVIE, max_length=255)
 
     genres = models.ManyToManyField(Genre, through='GenreFilmWork')

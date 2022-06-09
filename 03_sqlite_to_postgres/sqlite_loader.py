@@ -1,9 +1,8 @@
-from dataclasses import is_dataclass
-from datetime import datetime
 import sqlite3
 from typing import Any, Dict, Iterator, List
 import uuid
 from dateutil.parser import parse
+from handlers import GenreHandler, PersonHandler, FilmWorkHandler, GenreFilmWorkHandler, PersonFilmWorkHandler
 
 from schema import Genre, Schema, FilmWork, Person, GenreFilmWork, PersonFilmWork
 
@@ -40,8 +39,7 @@ class SQLiteLoader:
             f'LEFT JOIN genre_film_work mg ON mg.film_work_id = m.id '
             f'LEFT JOIN genre g ON mg.genre_id = g.id '
             f'LEFT JOIN person_film_work mp ON mp.film_work_id = m.id '
-            f'LEFT JOIN person p ON mp.person_id = p.id '
-            f'GROUP BY m.id;'
+            f'LEFT JOIN person p ON mp.person_id = p.id;'
         )
         data = {
             Schema.genre: None,
@@ -53,52 +51,56 @@ class SQLiteLoader:
         raw_objects = None
         self.curs.execute(query)
 
+        count = []
         while raw_objects != []:
             raw_objects: List[Dict[str, Any]] = self.curs.fetchmany(chunk)
 
             for raw_object in raw_objects:
                 raw_object = dict_factory(self.curs, raw_object)
 
-                data[Schema.genre] = Genre(
-                    id=uuid.UUID(raw_object[f'{Schema.genre}_id']),
+                data[Schema.genre] = GenreHandler(
+                    id=raw_object[f'{Schema.genre}_id'],
                     name=raw_object[f'{Schema.genre}_name'],
                     description=raw_object[f'{Schema.genre}_description'],
-                    created_at=parse(raw_object[f'{Schema.genre}_created_at']),
-                    updated_at=parse(raw_object[f'{Schema.genre}_updated_at']),
-                )
+                    created_at=raw_object[f'{Schema.genre}_created_at'],
+                    updated_at=raw_object[f'{Schema.genre}_updated_at'],
+                ).get_dataclass()
 
-                data[Schema.person] = Person(
-                    id=uuid.UUID(raw_object[f'{Schema.person}_id']),
+                data[Schema.person] = PersonHandler(
+                    id=raw_object[f'{Schema.person}_id'],
                     full_name=raw_object[f'{Schema.person}_full_name'],
-                    created_at=parse(raw_object[f'{Schema.person}_created_at']),
-                    updated_at=parse(raw_object[f'{Schema.person}_updated_at']),
-                )
+                    created_at=raw_object[f'{Schema.person}_created_at'],
+                    updated_at=raw_object[f'{Schema.person}_updated_at'],
+                ).get_dataclass()
 
-                data[Schema.film_work] = FilmWork(
-                    id=uuid.UUID(raw_object[f'{Schema.film_work}_id']),
+                data[Schema.film_work] = FilmWorkHandler(
+                    id=raw_object[f'{Schema.film_work}_id'],
                     title=raw_object[f'{Schema.film_work}_title'],
                     description=raw_object[f'{Schema.film_work}_description'],
                     creation_date=raw_object[f'{Schema.film_work}_creation_date'],
                     file_path=raw_object[f'{Schema.film_work}_file_path'],
                     rating=raw_object[f'{Schema.film_work}_rating'],
                     type=raw_object[f'{Schema.film_work}_type'],
-                    created_at=parse(raw_object[f'{Schema.film_work}_created_at']),
-                    updated_at=parse(raw_object[f'{Schema.film_work}_updated_at']),
-                )
+                    created_at=raw_object[f'{Schema.film_work}_created_at'],
+                    updated_at=raw_object[f'{Schema.film_work}_updated_at'],
+                ).get_dataclass()
 
-                data[Schema.genre_film_work] = GenreFilmWork(
-                    id=uuid.UUID(raw_object[f'{Schema.genre_film_work}_id']),
-                    film_work_id=uuid.UUID(raw_object[f'{Schema.genre_film_work}_film_work_id']),
-                    genre_id=uuid.UUID(raw_object[f'{Schema.genre_film_work}_genre_id']),
-                    created_at=parse(raw_object[f'{Schema.genre_film_work}_created_at']),
-                )
+                data[Schema.genre_film_work] = GenreFilmWorkHandler(
+                    id=raw_object[f'{Schema.genre_film_work}_id'],
+                    film_work_id=raw_object[f'{Schema.genre_film_work}_film_work_id'],
+                    genre_id=raw_object[f'{Schema.genre_film_work}_genre_id'],
+                    created_at=raw_object[f'{Schema.genre_film_work}_created_at'],
+                ).get_dataclass()
 
-                data[Schema.person_film_work] = PersonFilmWork(
-                    id=uuid.UUID(raw_object[f'{Schema.person_film_work}_id']),
-                    film_work_id=uuid.UUID(raw_object[f'{Schema.person_film_work}_film_work_id']),
-                    person_id=uuid.UUID(raw_object[f'{Schema.person_film_work}_person_id']),
+                if data[Schema.genre_film_work] is not None:
+                    count.append(raw_object[f'{Schema.genre_film_work}_id'])
+
+                data[Schema.person_film_work] = PersonFilmWorkHandler(
+                    id=raw_object[f'{Schema.person_film_work}_id'],
+                    film_work_id=raw_object[f'{Schema.person_film_work}_film_work_id'],
+                    person_id=raw_object[f'{Schema.person_film_work}_person_id'],
                     role=raw_object[f'{Schema.person_film_work}_role'],
-                    created_at=parse(raw_object[f'{Schema.person_film_work}_created_at']),
-                )
+                    created_at=raw_object[f'{Schema.person_film_work}_created_at'],
+                ).get_dataclass()
 
                 yield data

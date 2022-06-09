@@ -1,5 +1,4 @@
 from datetime import date, datetime
-import enum
 from typing import Optional
 import uuid 
 
@@ -15,12 +14,6 @@ class Schema:
     person = 'person'
     genre_film_work = 'genre_film_work'
     person_film_work = 'person_film_work'
-
-
-
-class FilmWorkType(enum.Enum):
-    tv_show = "TV Show"
-    movie = "Movie"
 
 
 @dataclass
@@ -48,7 +41,7 @@ class FilmWorkBase:
     file_path : Optional[str]
     type: str
     creation_date: Optional[date] = field(default=None)
-    rating: float = field(default=0.0)
+    rating: Optional[float] = field(default=None)
 
 
 @enforce_types
