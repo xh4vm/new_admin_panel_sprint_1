@@ -7,7 +7,6 @@ from schema import Genre, Schema, FilmWork, Person, GenreFilmWork, PersonFilmWor
 
 
 class PostgresSaver:
-
     def __init__(self, pg_cursor: DictCursor, chunk_size: int = 20):
         self.curs = pg_cursor
         self.loaded_data = {
@@ -18,7 +17,7 @@ class PostgresSaver:
             Schema.person_film_work: [],
         }
         self.chunk_size = chunk_size
-    
+
         logging.root.setLevel(logging.NOTSET)
         logging.basicConfig(level=logging.NOTSET)
         self.logger = logging.getLogger(__name__)
@@ -89,7 +88,7 @@ class PostgresSaver:
         self._multiple_insert(
             insert_query, ((elem.film_work_id, elem.person_id, elem.role, elem.created_at, elem.id,) for elem in data)
         )
-        
+
         self.logger.debug(f'Success multiple insert person_movies ({len(data)} objects)')
 
     def _save_genre_movies(self, data: Iterator[GenreFilmWork]) -> None:
@@ -105,7 +104,9 @@ class PostgresSaver:
 
         self.logger.debug(f'Success multiple insert genre_movies ({len(data)} objects)')
 
-    def _stack_or_flush(self, schema_name: str, data: Optional[type], callback: Callable[[Iterator[type]], None], is_last: bool):
+    def _stack_or_flush(
+        self, schema_name: str, data: Optional[type], callback: Callable[[Iterator[type]], None], is_last: bool
+    ):
         if data is not None:
             self.loaded_data[schema_name].append(data)
 
@@ -116,34 +117,45 @@ class PostgresSaver:
 
     def _stack_or_flush_all_data(self, obj: Dict[str, type], is_last: bool = False) -> None:
         try:
-            self._stack_or_flush(schema_name=Schema.genre, data=obj[Schema.genre], callback=self._save_genres, is_last=is_last)
-            self._stack_or_flush(schema_name=Schema.person, data=obj[Schema.person], callback=self._save_persons, is_last=is_last)
-            self._stack_or_flush(schema_name=Schema.film_work, data=obj[Schema.film_work], callback=self._save_movies, is_last=is_last)
             self._stack_or_flush(
-                schema_name=Schema.genre_film_work, data=obj[Schema.genre_film_work], callback=self._save_genre_movies, is_last=is_last
+                schema_name=Schema.genre, data=obj[Schema.genre], callback=self._save_genres, is_last=is_last
+            )
+            self._stack_or_flush(
+                schema_name=Schema.person, data=obj[Schema.person], callback=self._save_persons, is_last=is_last
+            )
+            self._stack_or_flush(
+                schema_name=Schema.film_work, data=obj[Schema.film_work], callback=self._save_movies, is_last=is_last
+            )
+            self._stack_or_flush(
+                schema_name=Schema.genre_film_work,
+                data=obj[Schema.genre_film_work],
+                callback=self._save_genre_movies,
+                is_last=is_last,
             )
             self._stack_or_flush(
                 schema_name=Schema.person_film_work,
                 data=obj[Schema.person_film_work],
                 callback=self._save_person_movies,
-                is_last=is_last
+                is_last=is_last,
             )
 
             self.curs.execute('COMMIT;')
-        
+
         except Exception as err:
             self.curs.execute('ROLLBACK;')
-            
+
             self.logger.error(f'Error stack or flush data! Message: {err}')
 
             raise err
 
     def save_all_data(self, data: Iterator[Dict[str, type]]) -> None:
-        last_obj = {Schema.genre: None,
+        last_obj = {
+            Schema.genre: None,
             Schema.person: None,
             Schema.film_work: None,
             Schema.genre_film_work: None,
-            Schema.person_film_work: None}
+            Schema.person_film_work: None,
+        }
 
         self.logger.info(f'Start saving all data to PostgreSQL database instance.')
 

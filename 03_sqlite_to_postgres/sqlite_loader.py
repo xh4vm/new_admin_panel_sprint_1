@@ -15,7 +15,6 @@ def dict_factory(cursor, row):
 
 
 class SQLiteLoader:
-
     def __init__(self, connection: sqlite3.Connection, chunk_size: int = 20) -> None:
         self.conn = connection
         self.curs = self.conn.cursor()
@@ -57,7 +56,7 @@ class SQLiteLoader:
 
         while raw_objects != []:
             raw_objects: List[Dict[str, Any]] = self.curs.fetchmany(self.chunk_size)
-            
+
             self.logger.debug(f'Fetching {len(raw_objects)} objects.')
 
             for raw_object in raw_objects:

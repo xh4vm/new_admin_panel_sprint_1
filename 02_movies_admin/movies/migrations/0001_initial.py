@@ -10,8 +10,7 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
@@ -24,14 +23,28 @@ class Migration(migrations.Migration):
                 ('description', models.CharField(max_length=4096, verbose_name='description')),
                 ('creation_date', models.DateField(verbose_name='creation_date')),
                 ('file_path', models.CharField(blank=True, default='', max_length=4096, verbose_name='file_path')),
-                ('rating', models.FloatField(null=True, validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(100)], verbose_name='rating')),
-                ('type', models.CharField(choices=[('movie', 'Movie'), ('tv_show', 'TV Show')], default='movie', max_length=255, verbose_name='type')),
+                (
+                    'rating',
+                    models.FloatField(
+                        null=True,
+                        validators=[
+                            django.core.validators.MinValueValidator(0),
+                            django.core.validators.MaxValueValidator(100),
+                        ],
+                        verbose_name='rating',
+                    ),
+                ),
+                (
+                    'type',
+                    models.CharField(
+                        choices=[('movie', 'Movie'), ('tv_show', 'TV Show')],
+                        default='movie',
+                        max_length=255,
+                        verbose_name='type',
+                    ),
+                ),
             ],
-            options={
-                'verbose_name': 'Film',
-                'verbose_name_plural': 'Films',
-                'db_table': 'content"."film_work',
-            },
+            options={'verbose_name': 'Film', 'verbose_name_plural': 'Films', 'db_table': 'content"."film_work',},
         ),
         migrations.CreateModel(
             name='Genre',
@@ -42,11 +55,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=255, unique=True, verbose_name='name')),
                 ('description', models.TextField(blank=True, verbose_name='description')),
             ],
-            options={
-                'verbose_name': 'Genre',
-                'verbose_name_plural': 'Genres',
-                'db_table': 'content"."genre',
-            },
+            options={'verbose_name': 'Genre', 'verbose_name_plural': 'Genres', 'db_table': 'content"."genre',},
         ),
         migrations.CreateModel(
             name='Person',
@@ -56,20 +65,33 @@ class Migration(migrations.Migration):
                 ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
                 ('full_name', models.CharField(max_length=512, verbose_name='full_name')),
             ],
-            options={
-                'verbose_name': 'Person',
-                'verbose_name_plural': 'Persons',
-                'db_table': 'content"."person',
-            },
+            options={'verbose_name': 'Person', 'verbose_name_plural': 'Persons', 'db_table': 'content"."person',},
         ),
         migrations.CreateModel(
             name='PersonFilmWork',
             fields=[
                 ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('role', models.CharField(choices=[('actor', 'Actor'), ('writer', 'Writer'), ('director', 'Director')], max_length=255, verbose_name='role')),
+                (
+                    'role',
+                    models.CharField(
+                        choices=[('actor', 'Actor'), ('writer', 'Writer'), ('director', 'Director')],
+                        max_length=255,
+                        verbose_name='role',
+                    ),
+                ),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('film_work', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='movies.filmwork', verbose_name='Film Work')),
-                ('person', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='movies.person', verbose_name='Person')),
+                (
+                    'film_work',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to='movies.filmwork', verbose_name='Film Work'
+                    ),
+                ),
+                (
+                    'person',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to='movies.person', verbose_name='Person'
+                    ),
+                ),
             ],
             options={
                 'verbose_name': 'Person',
@@ -87,8 +109,18 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('film_work', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='movies.filmwork', verbose_name='Film Work')),
-                ('genre', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='movies.genre', verbose_name='Genre')),
+                (
+                    'film_work',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to='movies.filmwork', verbose_name='Film Work'
+                    ),
+                ),
+                (
+                    'genre',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to='movies.genre', verbose_name='Genre'
+                    ),
+                ),
             ],
             options={
                 'verbose_name': 'Genre',

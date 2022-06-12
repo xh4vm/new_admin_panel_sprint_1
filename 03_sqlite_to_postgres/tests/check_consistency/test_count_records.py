@@ -4,7 +4,6 @@ from schema import Schema, SCHEMA_NAME
 
 
 class TestCountRecords:
-
     def test_count_genre_records(self, sqlite_cursor: Cursor, pg_cursor: DictCursor):
 
         sqlite_query = f'SELECT COUNT(*) FROM {Schema.genre};'

@@ -15,7 +15,9 @@ class TestDatabaseRecords:
         sqlite_query = f'SELECT * FROM {Schema.genre} ORDER BY id;'
         sqlite_cursor.execute(sqlite_query)
         raw_in_sqlite: list = sqlite_cursor.fetchmany(self.limit)
-        sqlite_result: List[Genre] = [GenreHandler(**dict_factory(sqlite_cursor, raw_genre)).get_dataclass() for raw_genre in raw_in_sqlite]
+        sqlite_result: List[Genre] = [
+            GenreHandler(**dict_factory(sqlite_cursor, raw_genre)).get_dataclass() for raw_genre in raw_in_sqlite
+        ]
 
         pg_query = f'SELECT * FROM {SCHEMA_NAME}.{Schema.genre} ORDER BY id;'
         pg_cursor.execute(pg_query)
@@ -29,7 +31,9 @@ class TestDatabaseRecords:
         sqlite_query = f'SELECT * FROM {Schema.genre} ORDER BY id DESC;'
         sqlite_cursor.execute(sqlite_query)
         raw_in_sqlite: list = sqlite_cursor.fetchmany(self.limit)
-        sqlite_result: List[Genre] = [GenreHandler(**dict_factory(sqlite_cursor, raw_genre)).get_dataclass() for raw_genre in raw_in_sqlite]
+        sqlite_result: List[Genre] = [
+            GenreHandler(**dict_factory(sqlite_cursor, raw_genre)).get_dataclass() for raw_genre in raw_in_sqlite
+        ]
 
         pg_query = f'SELECT * FROM {SCHEMA_NAME}.{Schema.genre} ORDER BY id DESC;'
         pg_cursor.execute(pg_query)
@@ -43,7 +47,9 @@ class TestDatabaseRecords:
         sqlite_query = f'SELECT * FROM {Schema.person} ORDER BY id;'
         sqlite_cursor.execute(sqlite_query)
         raw_in_sqlite: list = sqlite_cursor.fetchmany(self.limit)
-        sqlite_result: List[Person] = [PersonHandler(**dict_factory(sqlite_cursor, raw_person)).get_dataclass() for raw_person in raw_in_sqlite]
+        sqlite_result: List[Person] = [
+            PersonHandler(**dict_factory(sqlite_cursor, raw_person)).get_dataclass() for raw_person in raw_in_sqlite
+        ]
 
         pg_query = f'SELECT * FROM {SCHEMA_NAME}.{Schema.person} ORDER BY id;'
         pg_cursor.execute(pg_query)
@@ -57,7 +63,9 @@ class TestDatabaseRecords:
         sqlite_query = f'SELECT * FROM {Schema.person} ORDER BY id DESC;'
         sqlite_cursor.execute(sqlite_query)
         raw_in_sqlite: list = sqlite_cursor.fetchmany(self.limit)
-        sqlite_result: List[Person] = [PersonHandler(**dict_factory(sqlite_cursor, raw_person)).get_dataclass() for raw_person in raw_in_sqlite]
+        sqlite_result: List[Person] = [
+            PersonHandler(**dict_factory(sqlite_cursor, raw_person)).get_dataclass() for raw_person in raw_in_sqlite
+        ]
 
         pg_query = f'SELECT * FROM {SCHEMA_NAME}.{Schema.person} ORDER BY id DESC;'
         pg_cursor.execute(pg_query)
@@ -71,7 +79,10 @@ class TestDatabaseRecords:
         sqlite_query = f'SELECT * FROM {Schema.film_work} ORDER BY id;'
         sqlite_cursor.execute(sqlite_query)
         raw_in_sqlite: list = sqlite_cursor.fetchmany(self.limit)
-        sqlite_result: List[FilmWork] = [FilmWorkHandler(**dict_factory(sqlite_cursor, raw_film_work)).get_dataclass() for raw_film_work in raw_in_sqlite]
+        sqlite_result: List[FilmWork] = [
+            FilmWorkHandler(**dict_factory(sqlite_cursor, raw_film_work)).get_dataclass()
+            for raw_film_work in raw_in_sqlite
+        ]
 
         pg_query = f'SELECT * FROM {SCHEMA_NAME}.{Schema.film_work} ORDER BY id;'
         pg_cursor.execute(pg_query)
@@ -85,7 +96,10 @@ class TestDatabaseRecords:
         sqlite_query = f'SELECT * FROM {Schema.film_work} ORDER BY id DESC;'
         sqlite_cursor.execute(sqlite_query)
         raw_in_sqlite: list = sqlite_cursor.fetchmany(self.limit)
-        sqlite_result: List[FilmWork] = [FilmWorkHandler(**dict_factory(sqlite_cursor, raw_film_work)).get_dataclass() for raw_film_work in raw_in_sqlite]
+        sqlite_result: List[FilmWork] = [
+            FilmWorkHandler(**dict_factory(sqlite_cursor, raw_film_work)).get_dataclass()
+            for raw_film_work in raw_in_sqlite
+        ]
 
         pg_query = f'SELECT * FROM {SCHEMA_NAME}.{Schema.film_work} ORDER BY id DESC;'
         pg_cursor.execute(pg_query)
@@ -99,12 +113,17 @@ class TestDatabaseRecords:
         sqlite_query = f'SELECT * FROM {Schema.genre_film_work} ORDER BY id;'
         sqlite_cursor.execute(sqlite_query)
         raw_in_sqlite: list = sqlite_cursor.fetchmany(self.limit)
-        sqlite_result: List[GenreFilmWork] = [GenreFilmWorkHandler(**dict_factory(sqlite_cursor, raw_genre_film_work)).get_dataclass() for raw_genre_film_work in raw_in_sqlite]
+        sqlite_result: List[GenreFilmWork] = [
+            GenreFilmWorkHandler(**dict_factory(sqlite_cursor, raw_genre_film_work)).get_dataclass()
+            for raw_genre_film_work in raw_in_sqlite
+        ]
 
         pg_query = f'SELECT * FROM {SCHEMA_NAME}.{Schema.genre_film_work} ORDER BY id;'
         pg_cursor.execute(pg_query)
         raw_in_pg: list = pg_cursor.fetchmany(self.limit)
-        pg_result: List[GenreFilmWork] = [GenreFilmWorkHandler(**raw_genre_film_work).get_dataclass() for raw_genre_film_work in raw_in_pg]
+        pg_result: List[GenreFilmWork] = [
+            GenreFilmWorkHandler(**raw_genre_film_work).get_dataclass() for raw_genre_film_work in raw_in_pg
+        ]
 
         assert sqlite_result == pg_result
 
@@ -113,12 +132,17 @@ class TestDatabaseRecords:
         sqlite_query = f'SELECT * FROM {Schema.genre_film_work} ORDER BY id DESC;'
         sqlite_cursor.execute(sqlite_query)
         raw_in_sqlite: list = sqlite_cursor.fetchmany(self.limit)
-        sqlite_result: List[GenreFilmWork] = [GenreFilmWorkHandler(**dict_factory(sqlite_cursor, raw_genre_film_work)).get_dataclass() for raw_genre_film_work in raw_in_sqlite]
+        sqlite_result: List[GenreFilmWork] = [
+            GenreFilmWorkHandler(**dict_factory(sqlite_cursor, raw_genre_film_work)).get_dataclass()
+            for raw_genre_film_work in raw_in_sqlite
+        ]
 
         pg_query = f'SELECT * FROM {SCHEMA_NAME}.{Schema.genre_film_work} ORDER BY id DESC;'
         pg_cursor.execute(pg_query)
         raw_in_pg: list = pg_cursor.fetchmany(self.limit)
-        pg_result: List[GenreFilmWork] = [GenreFilmWorkHandler(**raw_genre_film_work).get_dataclass() for raw_genre_film_work in raw_in_pg]
+        pg_result: List[GenreFilmWork] = [
+            GenreFilmWorkHandler(**raw_genre_film_work).get_dataclass() for raw_genre_film_work in raw_in_pg
+        ]
 
         assert sqlite_result == pg_result
 
@@ -127,12 +151,17 @@ class TestDatabaseRecords:
         sqlite_query = f'SELECT * FROM {Schema.person_film_work} ORDER BY id;'
         sqlite_cursor.execute(sqlite_query)
         raw_in_sqlite: list = sqlite_cursor.fetchmany(self.limit)
-        sqlite_result: List[PersonFilmWork] = [PersonFilmWorkHandler(**dict_factory(sqlite_cursor, raw_genre_film_work)).get_dataclass() for raw_genre_film_work in raw_in_sqlite]
+        sqlite_result: List[PersonFilmWork] = [
+            PersonFilmWorkHandler(**dict_factory(sqlite_cursor, raw_genre_film_work)).get_dataclass()
+            for raw_genre_film_work in raw_in_sqlite
+        ]
 
         pg_query = f'SELECT * FROM {SCHEMA_NAME}.{Schema.person_film_work} ORDER BY id;'
         pg_cursor.execute(pg_query)
         raw_in_pg: list = pg_cursor.fetchmany(self.limit)
-        pg_result: List[PersonFilmWork] = [PersonFilmWorkHandler(**raw_person_film_work).get_dataclass() for raw_person_film_work in raw_in_pg]
+        pg_result: List[PersonFilmWork] = [
+            PersonFilmWorkHandler(**raw_person_film_work).get_dataclass() for raw_person_film_work in raw_in_pg
+        ]
 
         assert sqlite_result == pg_result
 
@@ -141,11 +170,16 @@ class TestDatabaseRecords:
         sqlite_query = f'SELECT * FROM {Schema.person_film_work} ORDER BY id DESC;'
         sqlite_cursor.execute(sqlite_query)
         raw_in_sqlite: list = sqlite_cursor.fetchmany(self.limit)
-        sqlite_result: List[PersonFilmWork] = [PersonFilmWorkHandler(**dict_factory(sqlite_cursor, raw_person_film_work)).get_dataclass() for raw_person_film_work in raw_in_sqlite]
+        sqlite_result: List[PersonFilmWork] = [
+            PersonFilmWorkHandler(**dict_factory(sqlite_cursor, raw_person_film_work)).get_dataclass()
+            for raw_person_film_work in raw_in_sqlite
+        ]
 
         pg_query = f'SELECT * FROM {SCHEMA_NAME}.{Schema.person_film_work} ORDER BY id DESC;'
         pg_cursor.execute(pg_query)
         raw_in_pg: list = pg_cursor.fetchmany(self.limit)
-        pg_result: List[PersonFilmWork] = [PersonFilmWorkHandler(**raw_person_film_work).get_dataclass() for raw_person_film_work in raw_in_pg]
+        pg_result: List[PersonFilmWork] = [
+            PersonFilmWorkHandler(**raw_person_film_work).get_dataclass() for raw_person_film_work in raw_in_pg
+        ]
 
         assert sqlite_result == pg_result

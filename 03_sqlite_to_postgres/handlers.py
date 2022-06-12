@@ -71,7 +71,7 @@ class FilmWorkHandler(Handler):
         rating: Optional[float],
         type: Optional[str],
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         self.title = title
         self.description = description

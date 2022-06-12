@@ -1,12 +1,13 @@
 from datetime import date, datetime
 from typing import Optional
-import uuid 
+import uuid
 
 from dataclasses import dataclass, field
 from enforce_typing import enforce_types
 
 
 SCHEMA_NAME = 'content'
+
 
 class Schema:
     film_work = 'film_work'
@@ -36,9 +37,9 @@ class TimeStampedMixin:
 @enforce_types
 @dataclass
 class FilmWorkBase:
-    title : str
-    description : Optional[str]
-    file_path : Optional[str]
+    title: str
+    description: Optional[str]
+    file_path: Optional[str]
     type: str
     creation_date: Optional[date] = field(default=None)
     rating: Optional[float] = field(default=None)
@@ -53,8 +54,8 @@ class FilmWork(UUIDMixin, TimeStampedMixin, FilmWorkBase):
 @enforce_types
 @dataclass
 class GenreBase:
-    name : str
-    description : Optional[str]
+    name: str
+    description: Optional[str]
 
 
 @enforce_types
@@ -66,9 +67,9 @@ class Genre(UUIDMixin, TimeStampedMixin, GenreBase):
 @enforce_types
 @dataclass
 class GenreFilmWorkBase:
-    film_work_id : uuid.UUID
-    genre_id : uuid.UUID
-    created_at : datetime
+    film_work_id: uuid.UUID
+    genre_id: uuid.UUID
+    created_at: datetime
 
 
 @enforce_types
@@ -80,8 +81,7 @@ class GenreFilmWork(UUIDMixin, GenreFilmWorkBase):
 @enforce_types
 @dataclass
 class PersonBase:
-    full_name : str
-
+    full_name: str
 
 
 @enforce_types
@@ -93,10 +93,10 @@ class Person(UUIDMixin, TimeStampedMixin, PersonBase):
 @enforce_types
 @dataclass
 class PersonFilmWorkBase:
-    film_work_id : uuid.UUID
-    person_id : uuid.UUID
-    role : str
-    created_at : datetime
+    film_work_id: uuid.UUID
+    person_id: uuid.UUID
+    role: str
+    created_at: datetime
 
 
 @enforce_types

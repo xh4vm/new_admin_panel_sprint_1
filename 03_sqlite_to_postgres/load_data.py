@@ -41,6 +41,7 @@ def get_postgresql_dsl() -> Dict[str, Any]:
         'port': os.environ.get('DB_PORT', 5432),
     }
 
+
 if __name__ == '__main__':
 
     load_dotenv()
@@ -49,9 +50,7 @@ if __name__ == '__main__':
     sqlite_path = os.environ.get('SQLITE_PATH')
     schema_file = os.path.join(pathlib.Path(__file__).parent.absolute(), 'schema.sql')
 
-    with conn_context(
-        sqlite_path
-    ) as sqlite_conn, psycopg2.connect(
+    with conn_context(sqlite_path) as sqlite_conn, psycopg2.connect(
         **postgresql_dsl, cursor_factory=DictCursor
     ) as pg_conn, pg_conn.cursor() as pg_cursor:
 

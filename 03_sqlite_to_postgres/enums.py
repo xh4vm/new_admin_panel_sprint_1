@@ -6,9 +6,8 @@ class NoneEnum(enum.Enum):
 
 
 class StrValueEnum(enum.Enum):
-    
     @classmethod
-    def find_element(cls, value : str):
+    def find_element(cls, value: str):
 
         for elem in cls:
             if elem.value.lower() == value.lower():
