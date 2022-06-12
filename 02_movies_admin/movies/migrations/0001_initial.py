@@ -44,7 +44,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={'verbose_name': 'Film', 'verbose_name_plural': 'Films', 'db_table': 'content"."film_work',},
+            options={'verbose_name': 'Film', 'verbose_name_plural': 'Films', 'db_table': 'content"."film_work', },
         ),
         migrations.CreateModel(
             name='Genre',
@@ -55,7 +55,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=255, unique=True, verbose_name='name')),
                 ('description', models.TextField(blank=True, verbose_name='description')),
             ],
-            options={'verbose_name': 'Genre', 'verbose_name_plural': 'Genres', 'db_table': 'content"."genre',},
+            options={'verbose_name': 'Genre', 'verbose_name_plural': 'Genres', 'db_table': 'content"."genre', },
         ),
         migrations.CreateModel(
             name='Person',
@@ -65,7 +65,7 @@ class Migration(migrations.Migration):
                 ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
                 ('full_name', models.CharField(max_length=512, verbose_name='full_name')),
             ],
-            options={'verbose_name': 'Person', 'verbose_name_plural': 'Persons', 'db_table': 'content"."person',},
+            options={'verbose_name': 'Person', 'verbose_name_plural': 'Persons', 'db_table': 'content"."person', },
         ),
         migrations.CreateModel(
             name='PersonFilmWork',
