@@ -24,7 +24,7 @@ class Genre(UUIDMixin, TimeStampedMixin):
     description = models.TextField(_('description'), blank=True)
 
     class Meta:
-        db_table = "content'.'genre"
+        db_table = 'content\".\"genre'
         verbose_name = _('Genre')
         verbose_name_plural = _('Genres')
 
@@ -38,17 +38,18 @@ class FilmWorkType(models.TextChoices):
 
 
 class FilmWork(UUIDMixin, TimeStampedMixin):
-    title = models.CharField(_('title'), max_length=255, unique=True)
-    description = models.CharField(_('description'), max_length=4096)
-    creation_date = models.DateField(_('creation_date'))
+    title = models.CharField(_('title'), max_length=255)
+    description = models.CharField(_('description'), blank=True, max_length=4096)
+    creation_date = models.DateField(_('creation_date'), blank=True,)
     file_path = models.CharField(_('file_path'), max_length=4096, blank=True, default='')
-    rating = models.FloatField(_('rating'), validators=[MinValueValidator(0), MaxValueValidator(100)])
+    rating = models.FloatField(_('rating'), null=True,  validators=[MinValueValidator(0), MaxValueValidator(100)])
     type = models.CharField(_('type'), choices=FilmWorkType.choices, default=FilmWorkType.MOVIE, max_length=255)
 
-    genres = models.ManyToManyField(Genre, through='GenreFilmWork')
+    genres = models.ManyToManyField('Genre', through='GenreFilmWork', related_name='films')
+    persons = models.ManyToManyField('Person', through='PersonFilmWork')
 
     class Meta:
-        db_table = "content'.'film_work"
+        db_table = 'content\".\"film_work'
         verbose_name = _('Film')
         verbose_name_plural = _('Films')
 
@@ -65,7 +66,7 @@ class GenreFilmWork(UUIDMixin):
         return f'{self.id}'
 
     class Meta:
-        db_table = "content'.'genre_film_work"
+        db_table = 'content\".\"genre_film_work'
         verbose_name = _('Genre')
         verbose_name_plural = _('Genres')
         indexes = (
@@ -82,13 +83,14 @@ class Person(UUIDMixin, TimeStampedMixin):
         return self.full_name
 
     class Meta:
-        db_table = "content'.'person"
+        db_table = 'content\".\"person'
         verbose_name = _('Person')
         verbose_name_plural = _('Persons')
 
 
 class PersonFilmWorkRole(models.TextChoices):
     ACTOR = 'actor', _('Actor')
+    WRITER = 'writer', _('Writer')
     DIRECTOR = 'director', _('Director')
 
 
@@ -102,7 +104,7 @@ class PersonFilmWork(UUIDMixin):
         return f'{self.id}'
 
     class Meta:
-        db_table = "content'.'person_film_work"
+        db_table = 'content\".\"person_film_work'
         verbose_name = _('Person')
         verbose_name_plural = _('Persons')
         indexes = (
