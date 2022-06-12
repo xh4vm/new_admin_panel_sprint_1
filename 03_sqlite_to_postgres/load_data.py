@@ -5,7 +5,6 @@ from typing import Any, Dict
 
 import psycopg2
 
-# from psycopg2.extensions import connection as _connection
 from psycopg2.extras import DictCursor, register_uuid
 from contextlib import contextmanager
 from dotenv import load_dotenv
@@ -29,9 +28,6 @@ def load_from_sqlite(connection: sqlite3.Connection, pg_cursor: DictCursor) -> N
     postgres_saver = PostgresSaver(pg_cursor)
     sqlite_loader = SQLiteLoader(connection)
 
-    # data = sqlite_loader.load_movies()
-    # postgres_saver.save_all_data(data)
-
     data = sqlite_loader.load_movies()
     postgres_saver.save_all_data(data)
 
@@ -53,11 +49,12 @@ if __name__ == '__main__':
     sqlite_path = os.environ.get('SQLITE_PATH')
     schema_file = os.path.join(pathlib.Path(__file__).parent.absolute(), 'schema.sql')
 
-    with sqlite3.connect(
+    with conn_context(
         sqlite_path
     ) as sqlite_conn, psycopg2.connect(
         **postgresql_dsl, cursor_factory=DictCursor
     ) as pg_conn, pg_conn.cursor() as pg_cursor:
+
         with open(schema_file, 'r') as schema_fd:
             pg_cursor.execute(schema_fd.read())
 

@@ -3,6 +3,7 @@ from typing import Optional
 import uuid
 from schema import Genre, Person, FilmWork, GenreFilmWork, PersonFilmWork
 from enums import FilmWorkType, PersonFilmWorkRole
+import logging
 
 from dateutil.parser import parse
 
@@ -18,6 +19,10 @@ class Handler:
         self.created_at = parse(created_at) if type(created_at) == str else created_at
         self.updated_at = parse(updated_at) if type(updated_at) == str else updated_at
 
+        logging.root.setLevel(logging.NOTSET)
+        logging.basicConfig(level=logging.NOTSET)
+        self.logger = logging.getLogger(__name__)
+
 
 class GenreHandler(Handler):
     def __init__(self, name: str, description: str, *args, **kwargs) -> None:
@@ -29,6 +34,7 @@ class GenreHandler(Handler):
     def get_dataclass(self) -> Optional[Genre]:
 
         if self.id is None:
+            self.logger.debug(f'Genre id is none. Getting next element.')
             return None
 
         return Genre(
@@ -49,6 +55,7 @@ class PersonHandler(Handler):
     def get_dataclass(self) -> Optional[Person]:
 
         if self.id is None:
+            self.logger.debug(f'Person id is none. Getting next element.')
             return None
 
         return Person(full_name=self.full_name, created_at=self.created_at, updated_at=self.updated_at, id=self.id)
@@ -78,6 +85,7 @@ class FilmWorkHandler(Handler):
     def get_dataclass(self) -> Optional[FilmWork]:
 
         if self.id is None:
+            self.logger.debug(f'FilmWork id is none. Getting next element.')
             return None
 
         return FilmWork(
@@ -103,6 +111,7 @@ class GenreFilmWorkHandler(Handler):
     def get_dataclass(self) -> Optional[Genre]:
 
         if self.id is None:
+            self.logger.debug(f'GenreFilmWork id is none. Getting next element.')
             return None
 
         return GenreFilmWork(
@@ -123,6 +132,7 @@ class PersonFilmWorkHandler(Handler):
     def get_dataclass(self) -> Optional[Person]:
 
         if self.id is None:
+            self.logger.debug(f'PersonFilmWork id is none. Getting next element.')
             return None
 
         return PersonFilmWork(

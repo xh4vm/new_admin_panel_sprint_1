@@ -1,6 +1,6 @@
 import sqlite3
 from typing import Any, Dict, Iterator, List
-import uuid
+import logging
 from dateutil.parser import parse
 from handlers import GenreHandler, PersonHandler, FilmWorkHandler, GenreFilmWorkHandler, PersonFilmWorkHandler
 
@@ -15,13 +15,17 @@ def dict_factory(cursor, row):
 
 
 class SQLiteLoader:
-    CHUNK = 20
 
-    def __init__(self, connection: sqlite3.Connection) -> None:
+    def __init__(self, connection: sqlite3.Connection, chunk_size: int = 20) -> None:
         self.conn = connection
         self.curs = self.conn.cursor()
+        self.chunk_size = chunk_size
 
-    def load_movies(self, chunk: int = CHUNK) -> Iterator[type]:
+        logging.root.setLevel(logging.NOTSET)
+        logging.basicConfig(level=logging.NOTSET)
+        self.logger = logging.getLogger(__name__)
+
+    def load_movies(self) -> Iterator[type]:
         query = (
             f'SELECT m.id as {Schema.film_work}_id, m.title as {Schema.film_work}_title, m.description as {Schema.film_work}_description, '
             f'm.creation_date as {Schema.film_work}_creation_date, m.file_path as {Schema.film_work}_file_path, m.rating as {Schema.film_work}_rating, '
@@ -51,9 +55,10 @@ class SQLiteLoader:
         raw_objects = None
         self.curs.execute(query)
 
-        count = []
         while raw_objects != []:
-            raw_objects: List[Dict[str, Any]] = self.curs.fetchmany(chunk)
+            raw_objects: List[Dict[str, Any]] = self.curs.fetchmany(self.chunk_size)
+            
+            self.logger.debug(f'Fetching {len(raw_objects)} objects.')
 
             for raw_object in raw_objects:
                 raw_object = dict_factory(self.curs, raw_object)
@@ -91,9 +96,6 @@ class SQLiteLoader:
                     genre_id=raw_object[f'{Schema.genre_film_work}_genre_id'],
                     created_at=raw_object[f'{Schema.genre_film_work}_created_at'],
                 ).get_dataclass()
-
-                if data[Schema.genre_film_work] is not None:
-                    count.append(raw_object[f'{Schema.genre_film_work}_id'])
 
                 data[Schema.person_film_work] = PersonFilmWorkHandler(
                     id=raw_object[f'{Schema.person_film_work}_id'],
