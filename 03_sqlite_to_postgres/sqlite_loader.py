@@ -1,10 +1,9 @@
 import sqlite3
-from typing import Any, Dict, Iterator, List
+from typing import Any, Iterator
 import logging
-from dateutil.parser import parse
-from handlers import GenreHandler, PersonHandler, FilmWorkHandler, GenreFilmWorkHandler, PersonFilmWorkHandler
 
-from schema import Genre, Schema, FilmWork, Person, GenreFilmWork, PersonFilmWork
+from handlers import GenreHandler, PersonHandler, FilmWorkHandler, GenreFilmWorkHandler, PersonFilmWorkHandler
+from schema import Schema
 
 
 def dict_factory(cursor, row):
@@ -19,9 +18,6 @@ class SQLiteLoader:
         self.conn = connection
         self.curs = self.conn.cursor()
         self.chunk_size = chunk_size
-
-        logging.root.setLevel(logging.NOTSET)
-        logging.basicConfig(level=logging.NOTSET)
         self.logger = logging.getLogger(__name__)
 
     def load_movies(self) -> Iterator[type]:
@@ -55,7 +51,7 @@ class SQLiteLoader:
         self.curs.execute(query)
 
         while raw_objects != []:
-            raw_objects: List[Dict[str, Any]] = self.curs.fetchmany(self.chunk_size)
+            raw_objects: list[dict[str, Any]] = self.curs.fetchmany(self.chunk_size)
 
             self.logger.debug(f'Fetching {len(raw_objects)} objects.')
 

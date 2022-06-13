@@ -15,12 +15,9 @@ class Handler:
         created_at: Optional[datetime.isoformat] = None,
         updated_at: Optional[datetime.isoformat] = None,
     ):
-        self.id = uuid.UUID(id) if type(id) == str else id
-        self.created_at = parse(created_at) if type(created_at) == str else created_at
-        self.updated_at = parse(updated_at) if type(updated_at) == str else updated_at
-
-        logging.root.setLevel(logging.NOTSET)
-        logging.basicConfig(level=logging.NOTSET)
+        self.id = uuid.UUID(id) if isinstance(id, str) else id
+        self.created_at = parse(created_at) if isinstance(created_at, str) else created_at
+        self.updated_at = parse(updated_at) if isinstance(updated_at, str) else updated_at
         self.logger = logging.getLogger(__name__)
 
 
@@ -103,8 +100,8 @@ class FilmWorkHandler(Handler):
 
 class GenreFilmWorkHandler(Handler):
     def __init__(self, film_work_id: Optional[uuid.UUID], genre_id: Optional[uuid.UUID], *args, **kwargs) -> None:
-        self.film_work_id = uuid.UUID(film_work_id) if type(film_work_id) == str else film_work_id
-        self.genre_id = uuid.UUID(genre_id) if type(genre_id) == str else genre_id
+        self.film_work_id = uuid.UUID(film_work_id) if isinstance(film_work_id, str) else film_work_id
+        self.genre_id = uuid.UUID(genre_id) if isinstance(genre_id, str) else genre_id
 
         super().__init__(*args, **kwargs)
 
@@ -123,9 +120,9 @@ class PersonFilmWorkHandler(Handler):
     def __init__(
         self, film_work_id: Optional[uuid.UUID], person_id: Optional[uuid.UUID], role: Optional[str], *args, **kwargs
     ) -> None:
-        self.film_work_id = uuid.UUID(film_work_id) if type(film_work_id) == str else film_work_id
-        self.person_id = uuid.UUID(person_id) if type(person_id) == str else person_id
-        self.role = PersonFilmWorkRole.find_element(role).value if type(role) == str else role
+        self.film_work_id = uuid.UUID(film_work_id) if isinstance(film_work_id, str) else film_work_id
+        self.person_id = uuid.UUID(person_id) if isinstance(person_id, str) else person_id
+        self.role = PersonFilmWorkRole.find_element(role).value if isinstance(role, str) else role
 
         super().__init__(*args, **kwargs)
 

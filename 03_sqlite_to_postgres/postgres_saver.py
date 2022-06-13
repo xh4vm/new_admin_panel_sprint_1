@@ -1,6 +1,6 @@
-from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple
+from typing import Any, Iterator, Optional
 import logging
-
+from dataclasses import fields, is_dataclass, asdict
 from psycopg2.extras import DictCursor, execute_values
 
 from schema import Genre, Schema, FilmWork, Person, GenreFilmWork, PersonFilmWork, SCHEMA_NAME
@@ -9,135 +9,60 @@ from schema import Genre, Schema, FilmWork, Person, GenreFilmWork, PersonFilmWor
 class PostgresSaver:
     def __init__(self, pg_cursor: DictCursor, chunk_size: int = 20):
         self.curs = pg_cursor
-        self.loaded_data = {
-            Schema.genre: [],
-            Schema.person: [],
-            Schema.film_work: [],
-            Schema.genre_film_work: [],
-            Schema.person_film_work: [],
+        self.metadata = {
+            Schema.genre: Genre,
+            Schema.person: Person,
+            Schema.film_work: FilmWork,
+            Schema.genre_film_work: GenreFilmWork,
+            Schema.person_film_work: PersonFilmWork,
         }
+        self.loaded_data = {schema_name: [] for schema_name in self.metadata.keys()}
         self.chunk_size = chunk_size
-
-        logging.root.setLevel(logging.NOTSET)
-        logging.basicConfig(level=logging.NOTSET)
         self.logger = logging.getLogger(__name__)
 
-    def _multiple_insert(self, insert_query: str, data: List[Tuple[Any]]) -> None:
+    def _multiple_insert(self, insert_query: str, data: list[tuple[Any]]) -> None:
         execute_values(self.curs, insert_query, data)
 
-    def _save_movies(self, data: Iterator[FilmWork]) -> None:
+    def _get_values_statement(self, into_statement: list[str], data: type) -> tuple[Any]:
+        data_as_dict: dict[str, Any] = asdict(data)
+        return tuple(data_as_dict[key] for key in into_statement)
+
+    def _save_data(self, schema_name: str) -> None:
+        schema: type = self.metadata.get(schema_name)
+        data: Iterator[type] = self.loaded_data[schema_name]
+
+        if not is_dataclass(schema):
+            message = f'Error with saving dataclass: {schema_name}. Message: is not dataclass type.'
+            self.logger.error(message)
+            raise TypeError(message)
+
+        into_statement: list[str] = [field.name for field in fields(schema)]
         insert_query: str = (
-            f'INSERT INTO {SCHEMA_NAME}.{Schema.film_work}'
-            f'(title, description, creation_date, file_path, rating, type, created_at, updated_at, id) '
+            f'INSERT INTO {SCHEMA_NAME}.{schema_name}'
+            f'({", ".join(into_statement)}) '
             f'VALUES %s ON CONFLICT (id) DO NOTHING'
         )
 
         self._multiple_insert(
-            insert_query,
-            (
-                (
-                    elem.title,
-                    elem.description,
-                    elem.creation_date,
-                    elem.file_path,
-                    elem.rating,
-                    elem.type,
-                    elem.created_at,
-                    elem.updated_at,
-                    elem.id,
-                )
-                for elem in data
-            ),
+            insert_query, (self._get_values_statement(into_statement=into_statement, data=elem) for elem in data),
         )
 
-        self.logger.debug(f'Success multiple insert movies ({len(data)} objects)')
+        self.logger.debug(f'Success multiple insert {schema_name} ({len(data)} objects)')
 
-    def _save_genres(self, data: Iterator[Genre]) -> None:
-        insert_query: str = (
-            f'INSERT INTO {SCHEMA_NAME}.{Schema.genre}'
-            f'(name, description, created_at, updated_at, id) '
-            f'VALUES %s ON CONFLICT (id) DO NOTHING'
-        )
-
-        self._multiple_insert(
-            insert_query, ((elem.name, elem.description, elem.created_at, elem.updated_at, elem.id,) for elem in data)
-        )
-
-        self.logger.debug(f'Success multiple insert genres ({len(data)} objects)')
-
-    def _save_persons(self, data: Iterator[Person]) -> None:
-        insert_query: str = (
-            f'INSERT INTO {SCHEMA_NAME}.{Schema.person}'
-            f'(full_name, created_at, updated_at, id) '
-            f'VALUES %s ON CONFLICT (id) DO NOTHING'
-        )
-
-        self._multiple_insert(
-            insert_query, ((elem.full_name, elem.created_at, elem.updated_at, elem.id,) for elem in data)
-        )
-
-        self.logger.debug(f'Success multiple insert persons ({len(data)} objects)')
-
-    def _save_person_movies(self, data: Iterator[PersonFilmWork]) -> None:
-        insert_query: str = (
-            f'INSERT INTO {SCHEMA_NAME}.{Schema.person_film_work}'
-            f'(film_work_id, person_id, role, created_at, id) '
-            f'VALUES %s ON CONFLICT (id) DO NOTHING'
-        )
-
-        self._multiple_insert(
-            insert_query, ((elem.film_work_id, elem.person_id, elem.role, elem.created_at, elem.id,) for elem in data)
-        )
-
-        self.logger.debug(f'Success multiple insert person_movies ({len(data)} objects)')
-
-    def _save_genre_movies(self, data: Iterator[GenreFilmWork]) -> None:
-        insert_query: str = (
-            f'INSERT INTO {SCHEMA_NAME}.{Schema.genre_film_work}'
-            f'(film_work_id, genre_id, created_at, id) '
-            f'VALUES %s ON CONFLICT (id) DO NOTHING'
-        )
-
-        self._multiple_insert(
-            insert_query, ((elem.film_work_id, elem.genre_id, elem.created_at, elem.id,) for elem in data)
-        )
-
-        self.logger.debug(f'Success multiple insert genre_movies ({len(data)} objects)')
-
-    def _stack_or_flush(
-        self, schema_name: str, data: Optional[type], callback: Callable[[Iterator[type]], None], is_last: bool
-    ):
+    def _stack_or_flush(self, schema_name: str, data: Optional[type], is_last: bool):
         if data is not None:
             self.loaded_data[schema_name].append(data)
 
         if len(self.loaded_data[schema_name]) == self.chunk_size or is_last:
-            callback(self.loaded_data[schema_name])
+            self._save_data(schema_name=schema_name)
             self.loaded_data.update({schema_name: []})
             self.logger.debug(f'Chunk from {schema_name} schema has been flushed!')
 
-    def _stack_or_flush_all_data(self, obj: Dict[str, type], is_last: bool = False) -> None:
+    def _stack_or_flush_all_data(self, obj: dict[str, type], is_last: bool = False) -> None:
         try:
-            self._stack_or_flush(
-                schema_name=Schema.genre, data=obj[Schema.genre], callback=self._save_genres, is_last=is_last
-            )
-            self._stack_or_flush(
-                schema_name=Schema.person, data=obj[Schema.person], callback=self._save_persons, is_last=is_last
-            )
-            self._stack_or_flush(
-                schema_name=Schema.film_work, data=obj[Schema.film_work], callback=self._save_movies, is_last=is_last
-            )
-            self._stack_or_flush(
-                schema_name=Schema.genre_film_work,
-                data=obj[Schema.genre_film_work],
-                callback=self._save_genre_movies,
-                is_last=is_last,
-            )
-            self._stack_or_flush(
-                schema_name=Schema.person_film_work,
-                data=obj[Schema.person_film_work],
-                callback=self._save_person_movies,
-                is_last=is_last,
-            )
+
+            for schema_name in self.metadata.keys():
+                self._stack_or_flush(schema_name=schema_name, data=obj[schema_name], is_last=is_last)
 
             self.curs.execute('COMMIT;')
 
@@ -145,10 +70,9 @@ class PostgresSaver:
             self.curs.execute('ROLLBACK;')
 
             self.logger.error(f'Error stack or flush data! Message: {err}')
-
             raise err
 
-    def save_all_data(self, data: Iterator[Dict[str, type]]) -> None:
+    def save_all_data(self, data: Iterator[dict[str, type]]) -> None:
         last_obj = {
             Schema.genre: None,
             Schema.person: None,
